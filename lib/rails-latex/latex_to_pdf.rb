@@ -18,13 +18,15 @@ class LatexToPdf
     input=File.join(dir,'input.tex')
     FileUtils.mkdir_p(dir)
     File.open(input,'wb') {|io| io.write(code) }
-    Process.waitpid(fork do
+    puts "Start Process.waitpid with spawn"
+    Process.waitpid( spawn do
                       begin
                         Dir.chdir dir
                         STDOUT.reopen("input.log","a")
                         STDERR.reopen(STDOUT)
                         args=config[:arguments] + ['-shell-escape','-interaction','batchmode',"input.tex"]
                         system config[:command],'-draftmode',*args if parse_twice
+                        puts "Start exec"
                         exec config[:command],*args
                       rescue
                         File.open("input.log",'a') {|io|
